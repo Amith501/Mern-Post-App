@@ -7,10 +7,10 @@ trigger:
 - main
 
 pool:
-  vmImage: ubuntu-latest
+  name: Mern-post   # 👈 Your self-hosted agent pool
 
 steps:
-# Install root dependencies (if any)
+# Install root dependencies (if package.json exists at root)
 - task: Npm@1
   inputs:
     command: 'install'
@@ -19,30 +19,30 @@ steps:
 - task: Npm@1
   inputs:
     command: 'install'
-    workingDir: server
+    workingDir: 'server'
 
 # Install client dependencies
 - task: Npm@1
   inputs:
     command: 'install'
-    workingDir: client
+    workingDir: 'client'
 
 # Build client
 - task: Npm@1
   inputs:
     command: 'custom'
-    workingDir: client
+    workingDir: 'client'
     customCommand: 'run build'
 
-# Copy files to artifact staging directory
+# Copy built client + server to staging
 - task: CopyFiles@2
   inputs:
     Contents: |
-      client/build/**
+      client/dist/**   # if React CRA → use build/**
       server/**
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
-# Publish artifact
+# Publish build artifact
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
