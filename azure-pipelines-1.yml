@@ -7,27 +7,44 @@ trigger:
 - main
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'ubuntu-latest'
 
 steps:
+# Install root dependencies (if any)
 - task: Npm@1
   inputs:
     command: 'install'
+
+# Install server dependencies
 - task: Npm@1
   inputs:
     command: 'install'
-    workingDir: '"server"'
-  '
+    workingDir: server
+
+# Install client dependencies
+- task: Npm@1
+  inputs:
+    command: 'install'
+    workingDir: client
+
+# Build client
 - task: Npm@1
   inputs:
     command: 'custom'
-    workingDir: '"client"'
-    customCommand: '"run build"'
+    workingDir: client
+    customCommand: 'run build'
 
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: '''release'''
-        publishLocation: 'Container'
-    -
+# Copy files to artifact staging directory
+- task: CopyFiles@2
+  inputs:
+    Contents: |
+      client/build/**
+      server/**
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
+# Publish artifact
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'release'
+    publishLocation: 'Container'
