@@ -7,13 +7,14 @@ trigger:
 - main
 
 pool:
-  name: Mern-post   # 👈 Your self-hosted agent pool
+  name: Mern-post   
 
 steps:
-# Install root dependencies (if package.json exists at root)
-- task: Npm@1
+# Install Node.js
+- task: NodeTool@0
   inputs:
-    command: 'install'
+    versionSpec: '18.x'
+  displayName: "Install Node.js"
 
 # Install server dependencies
 - task: Npm@1
@@ -23,7 +24,6 @@ steps:
 
 # Install client dependencies
 - task: Npm@1
-
   inputs:
     command: 'install'
     workingDir: 'client'
@@ -39,7 +39,7 @@ steps:
 - task: CopyFiles@2
   inputs:
     Contents: |
-      client/dist/**   # if React CRA → use build/**
+      client/dist/**   # if CRA → change to client/build/**
       server/**
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
