@@ -23,6 +23,7 @@ steps:
 
 # Install client dependencies
 - task: Npm@1
+
   inputs:
     command: 'install'
     workingDir: 'client'
